@@ -7,9 +7,10 @@ export class UserBalance{
 id!: number;
 @Column()
 total!: number
-@OneToOne(()=>User, (user)=>user.balances)
-@JoinColumn({name:'users'})
-user!:User;
+
+@OneToOne(() => User, (user) => user.balance)
+@JoinColumn()
+userId!: User;;
 
 @Column()
 users!:number;

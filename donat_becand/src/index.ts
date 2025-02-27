@@ -4,6 +4,7 @@ import 'express';
 import express from 'express';
 import { AppDataSource } from '../DataSourse';
 import userRoutes from './routes/UserRoutes';
+import transactionRoutes from './routes/transactionRoutes';
 import cors from 'cors';
 const app = express();
 
@@ -17,6 +18,7 @@ AppDataSource.initialize()
 
     // Подключение маршрутов
     app.use('/api', userRoutes);
+    app.use('/api', transactionRoutes);
 
     app.listen(3000, () => {
       console.log('Сервер запущен на http://localhost:3000');

@@ -1,18 +1,28 @@
-import { Column, Entity, JoinColumn, OneToMany, PrimaryGeneratedColumn } from "typeorm";
+import { Column, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
 import { User } from "./User";
 @Entity('transaction')
 export class UserTransaction{
 @PrimaryGeneratedColumn()
 id!: number;
 
-@OneToMany(()=>User, (user)=>user.transactions)
-@JoinColumn({name:'sender'})
-user!:User;
+@ManyToOne(() => User, (user) => user.senderTransactions)
+@JoinColumn({ name: 'sender' })
+sender!: User;
+
 @Column()
-sender!: number;
-@OneToMany(()=>User, (user1)=>user1.transactions1)
-@JoinColumn({name:'resipient'})
-user1!:User;
+senderId!: number;  // Внешний ключ для отправителя
+
+// Связь с получателем (User)
+@ManyToOne(() => User, (user) => user.recipientTransactions)
+@JoinColumn({ name: 'recipient' })
+recipient!: User;
+
 @Column()
-resipient!:number;
+recipientId!: number;  // Внешний ключ для получателя
+
+@Column('decimal', { precision: 10, scale: 2 })
+amount!: number;  // Сумма перевода
+
+@Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
+createdAt!: Date;  // Время создания транзакции
 }

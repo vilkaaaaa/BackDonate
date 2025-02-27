@@ -1,4 +1,4 @@
-import { Entity, PrimaryGeneratedColumn, Column, OneToOne, OneToMany } from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column, OneToOne, OneToMany, ManyToOne } from 'typeorm';
 import { UserProfile } from './UserProfile';
 import { UserBalance } from './UserBalance';
 import { UserTransaction } from './UserTransaction';
@@ -14,13 +14,12 @@ export class User {
   password!: string;
 @OneToOne(()=>UserProfile, (profile)=>profile.userid)
 profiles!: UserProfile;
+@OneToOne(() => UserBalance, (balance) => balance.users)
+balance!: UserBalance;
 
-@OneToOne(()=>UserBalance, (balance)=>balance.users)
-balances!:UserBalance;
+@OneToMany(() => UserTransaction, (transaction) => transaction.sender)
+senderTransactions!: UserTransaction[];
 
-@OneToMany(()=> UserTransaction, (transaction)=>transaction.sender)
-transactions!:UserTransaction;
-
-@OneToMany(()=>UserTransaction, (transaction)=>transaction.resipient)
-transactions1!:UserTransaction;
+@OneToMany(() => UserTransaction, (transaction) => transaction.recipient)
+recipientTransactions!: UserTransaction[];
 }
