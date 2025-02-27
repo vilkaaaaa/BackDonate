@@ -1,7 +1,7 @@
-import { Entity, PrimaryGeneratedColumn, Column, OneToOne, OneToMany, Transaction } from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column, OneToOne, OneToMany } from 'typeorm';
 import { UserProfile } from './UserProfile';
 import { UserBalance } from './UserBalance';
-import { Transactions } from './Transactions';
+import { UserTransaction } from './UserTransaction';
 @Entity('users') 
 export class User {
   @PrimaryGeneratedColumn()
@@ -12,12 +12,15 @@ export class User {
 
   @Column({length : 225})
   password!: string;
-@OneToMany(()=>UserProfile, (profile)=>profile.userid)
+@OneToOne(()=>UserProfile, (profile)=>profile.userid)
 profiles!: UserProfile;
 
 @OneToOne(()=>UserBalance, (balance)=>balance.users)
 balances!:UserBalance;
 
-@OneToMany(()=>Transactions, (transaction)=>transaction.sender)
-transactionses!:Transactions;
+@OneToMany(()=> UserTransaction, (transaction)=>transaction.sender)
+transactions!:UserTransaction;
+
+@OneToMany(()=>UserTransaction, (transaction)=>transaction.resipient)
+transactions1!:UserTransaction;
 }

@@ -2,7 +2,7 @@ import { DataSource } from 'typeorm';
 import { User } from './src/entity/User';
 import { UserProfile } from './src/entity/UserProfile';
 import { UserBalance } from './src/entity/UserBalance';
-import { Transactions } from './src/entity/Transactions';
+import {  UserTransaction } from './src/entity/UserTransaction';
 
 export const AppDataSource = new DataSource({
   type: 'postgres',
@@ -11,6 +11,6 @@ export const AppDataSource = new DataSource({
   username: 'postgres',
   password: '1',
   database: 'postgres',
-  entities: [User, UserProfile, UserBalance, Transactions],  // Подключите ваши сущности
+  entities: [User, UserProfile, UserBalance, UserTransaction],  // Подключите ваши сущности
   synchronize: true, // Только для разработки!
 });
