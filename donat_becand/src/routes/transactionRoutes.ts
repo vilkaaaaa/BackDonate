@@ -1,5 +1,5 @@
 import express from 'express';
-import { TransactionController } from '../controllers/transactionController';
+import { TransactionController } from '../controllers/TransactionController';
 const router = express.Router();
 
 // Перевод денег (POST)

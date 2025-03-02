@@ -1,5 +1,6 @@
 import { User } from '../entity/User';
 import { AppDataSource } from '../../DataSourse';
+import { TokenService } from './TokenService';
 
 const userRepository = AppDataSource.getRepository(User);
 
@@ -8,12 +9,25 @@ export class UserService {
   async getUserById(id: number): Promise<User | null> {
     return userRepository.findOne({ where: { id } });
   }
+  //Получить пользователя по логину
+  async fetUserBeLogin(login: string):Promise<User | null>{
+return userRepository.findOne({where:{login}});
+  }
 
-  // Создать пользователя
   async createUser(userData: Partial<User>): Promise<User> {
+    // Хешируем пароль перед сохранением
+    if (userData.password) {
+      userData.password = await TokenService.hashPassword(userData.password);
+    }
     const user = userRepository.create(userData);
     return userRepository.save(user);
   }
+  
+  // // Создать пользователя
+  // async createUser(userData: Partial<User>): Promise<User> {
+  //   const user = userRepository.create(userData);
+  //   return userRepository.save(user);
+  // }
 
   // Обновить пользователя
   async updateUser(id: number, userData: Partial<User>): Promise<User | null> {
