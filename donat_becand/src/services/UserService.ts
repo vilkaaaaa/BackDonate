@@ -15,9 +15,12 @@ return userRepository.findOne({where:{login}});
   }
 
   async createUser(userData: Partial<User>): Promise<User> {
-    // Хешируем пароль перед сохранением
     if (userData.password) {
+      console.log('Пароль до хеширования:', JSON.stringify(userData.password)); // Логируем пароль как строку
+      console.log('Длина пароля до хеширования:', userData.password.length);
       userData.password = await TokenService.hashPassword(userData.password);
+      console.log('Пароль после хеширования:', userData.password);
+      console.log('Длина хеша:', userData.password.length);
     }
     const user = userRepository.create(userData);
     return userRepository.save(user);

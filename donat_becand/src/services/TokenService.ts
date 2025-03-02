@@ -21,11 +21,17 @@ export class TokenService {
 
   // Хеширование пароля
   static async hashPassword(password: string): Promise<string> {
-    return bcrypt.hash(password, 10);
+    const saltRounds = 10; // Количество раундов хеширования
+    return await bcrypt.hash(password, saltRounds);
   }
 
   // Сравнение пароля с хешем
   static async comparePassword(password: string, hash: string): Promise<boolean> {
-    return bcrypt.compare(password, hash);
+    console.log('Сравнение пароля:', JSON.stringify(password), 'с хешем:', hash);
+    console.log('Длина пароля:', password.length);
+    console.log('Длина хеша:', hash.length);
+    const result = await bcrypt.compare(password, hash);
+    console.log('Результат сравнения:', result);
+    return result;
   }
 }

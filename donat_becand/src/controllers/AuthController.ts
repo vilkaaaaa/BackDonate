@@ -84,10 +84,9 @@ export class AuthController {
             }
 
             // Хеширование пароля
-            const hashedPassword = await TokenService.hashPassword(password);
             const newUser = await userService.createUser({
                 login,
-                password: hashedPassword,
+                password,
                 ...rest
             });
 
@@ -104,36 +103,47 @@ export class AuthController {
     // Аутентификация пользователя
     async login(req: Request, res: Response) {
         try {
-            const { login, password } = req.body;
-
-            const user = await userService.fetUserBeLogin(login);
-            if (!user) {
-                return res.status(401).json({ error: 'Неверные учетные данные' });
+          const { login, password } = req.body;
+          console.log('Вход:', { login, password });
+          console.log('Пароль в запросе:', JSON.stringify(password)); // Логируем пароль как строку
+          console.log('Длина пароля в запросе:', password.length);
+      
+          const user = await userService.fetUserBeLogin(login);
+          if (!user) {
+            console.log('Пользователь не найден');
+            return res.status(401).json({ error: 'Неверные учетные данные' });
+          }
+      
+          console.log('Пользователь найден:', user);
+          console.log('Хешированный пароль в базе:', user.password);
+          console.log('Длина хеша в базе:', user.password.length);
+      
+          const isValid = await TokenService.comparePassword(password, user.password);
+          if (!isValid) {
+            console.log('Неверный пароль');
+            return res.status(401).json({ error: 'Неверные учетные данные' });
+          }
+      
+          const token = TokenService.generateToken(user.id, user.login);
+          console.log('Токен сгенерирован:', token);
+      
+          res.json({
+            token,
+            user: {
+              id: user.id,
+              login: user.login
             }
-
-            const isValid = await TokenService.comparePassword(password, user.password);
-            if (!isValid) {
-                return res.status(401).json({ error: 'Неверные учетные данные' });
-            }
-
-            // Генерация токена
-            const token = TokenService.generateToken(user.id, user.login);
-
-            res.json({
-                token,
-                user: {
-                    id: user.id,
-                    login: user.login
-                }
-            });
+          });
         } catch (error) {
-            res.status(500).json({ error: 'Ошибка сервера' });
+          console.error('Ошибка входа:', error);
+          res.status(500).json({ error: 'Ошибка сервера' });
         }
-    }
+      }
 
     // Получение данных пользователя (защищенный маршрут)
     async getUserByLogin(req: Request, res: Response) {
         try {
+            
             // Проверяем наличие пользователя
             if (!req.user) {
                 return res.status(401).json({ error: 'Пользователь не авторизован' });
