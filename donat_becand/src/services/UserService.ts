@@ -2,7 +2,6 @@ import { User } from '../entity/User';
 import { AppDataSource } from '../../DataSourse';
 import { TokenService } from './TokenService';
 import { UserProfile } from '../entity/UserProfile';
-import { UserBalance } from '../entity/UserBalance';
 
 const userRepository = AppDataSource.getRepository(User);
 const profileRepository = AppDataSource.getRepository(UserProfile);

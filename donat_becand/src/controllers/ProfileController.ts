@@ -5,12 +5,51 @@ const profileService = new ProfileService;
 
 export class ProfileController{
 //Получить профиль пользователя ччерез id или UserId
+async getProfileByUser(req: Request, res: Response) {
+    try {
+      const userId = parseInt(req.params.userId, 10); // Получаем ID пользователя из параметров запроса
+      console.log('Переданный userId:', userId); // Логируем userId
 
-//создание Пустого профиля по ид пользователя(имя- логин пользователя, цель - заглушка, аватар - заглушка по ссылке https://i.li.ru/av/704070_274469.jpg, баланс - 0, транзакции)
+      // Проверяем, что userId является числом
+      if (isNaN(userId)) {
+        return res.status(400).json({ error: 'Некорректный ID пользователя' });
+      }
 
+      // Получаем профиль по ID пользователя
+      const profile = await profileService.getProfileByUserId(userId);
 
+      if (!profile) {
+        return res.status(404).json({ error: 'Профиль не найден' });
+      }
+
+      // Возвращаем профиль
+      res.status(200).json(profile);
+    } catch (error) {
+      console.error('Ошибка при получении профиля:', error);
+      res.status(500).json({ error: 'Ошибка сервера' });
+    }
+  }
 //обновить данные
+async Update(req:Request, res: Response){
+    try {
+        const userId = parseInt(req.params.userId, 10); // Получаем ID пользователя из параметров запроса
+        console.log('Переданный userId:', userId); // Логируем userId
+        if (isNaN(userId)) {
+            return res.status(400).json({ error: 'Некорректный ID пользователя' });
+          }
+          const profile = await profileService.getProfileByUserId(userId);
+          if (!profile) {
+            return res.status(404).json({ error: 'Профиль не найден' });
+          }
+    const userData = req.body;
+    const updateprofile = await profileService.updateProfile(userId, userData);
 
-//Удалить профиль
-
+      res.json(updateprofile);
+        }
+        catch(error){
+      res.status(404).json({ message: 'Профиль не найден' });
+         }
+         
+         }
 }
+//Удалить профиль

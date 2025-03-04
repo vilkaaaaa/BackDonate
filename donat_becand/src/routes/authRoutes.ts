@@ -19,4 +19,10 @@ router.post('/login',
     }
 );
 
+router.post('/user', 
+     AuthController.authMiddleware, (req, res) => {
+        authController.getUserProfile(req, res)
+    }
+);
+
 export default router;
