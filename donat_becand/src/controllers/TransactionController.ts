@@ -5,8 +5,8 @@ export class TransactionController {
   // Перевод денег
   static async transferMoney(req: Request, res: Response) {
     try {
-      const { senderId, recipientId, amount } = req.body;
-      const transaction = await TransactionService.transferMoney(senderId, recipientId, amount);
+      const { senderId, recipientId, amount, massage } = req.body;
+      const transaction = await TransactionService.transferMoney(senderId, recipientId, amount, massage);
       res.status(201).json(transaction);
     } catch (error) {
       // Проверяем, что error является объектом Error

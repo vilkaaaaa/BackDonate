@@ -5,13 +5,13 @@ import { User } from "./User";
 export class UserBalance{
 @PrimaryGeneratedColumn()
 id!: number;
-@Column()
-total!: number
+@Column('decimal', {precision: 10, scale: 2})
+total!: number;
 
 @OneToOne(() => User, (user) => user.balance)
-@JoinColumn()
-userId!: User;;
+@JoinColumn({name:"userId"})
+users!: User;;
 
 @Column()
-users!:number;
+userId!:number;
 }

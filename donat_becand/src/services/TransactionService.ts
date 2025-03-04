@@ -8,7 +8,7 @@ const userBalanceRepository = AppDataSource.getRepository(UserBalance);
 
 export class TransactionService {
   // Перевод денег
-  static async transferMoney(senderId: number, recipientId: number, amount: number) {
+  static async transferMoney(senderId: number, recipientId: number, amount: number, massage: string) {
     const queryRunner = AppDataSource.createQueryRunner();
 
     try {
@@ -49,9 +49,10 @@ export class TransactionService {
 
       // Создаем транзакцию
       const transaction = new UserTransaction();
-      transaction.sender = sender;
-      transaction.recipient = recipient;
+      transaction.senderId = sender;
+      transaction.recipientId = recipient;
       transaction.amount = amount;
+      transaction.massage = massage;
 
       await queryRunner.manager.save(transaction);
 
