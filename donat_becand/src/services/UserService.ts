@@ -12,7 +12,7 @@ export class UserService {
     return userRepository.findOne({ where: { id } });
   }
   //Получить пользователя по логину
-  async fetUserBeLogin(login: string):Promise<User | null>{
+  async getUserBeLogin(login: string):Promise<User | null>{
 return userRepository.findOne({where:{login}});
   }
 

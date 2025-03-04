@@ -20,9 +20,10 @@ export class AuthController {
                 res.status(401).json({ error: 'Требуется авторизация' });
                 return;
             }
-
-            const decoded = TokenService.verifyToken(token) as { Id: number; login: string };
-            req.user = decoded;
+            
+            // Используем verifyAccessToken и правильный тип
+            const decoded = TokenService.verifyAccessToken(token) as { userId: number; login: string };
+            req.user = decoded; // Теперь используется userId вместо Id
             next();
         } catch (error) {
             res.status(401).json({ error: 'Недействительный токен' });
@@ -35,7 +36,8 @@ export class AuthController {
                 return res.status(401).json({ error: 'Не авторизован' });
             }
 
-            const userId = req.user.Id;
+            // Исправлено на userId
+            const userId = req.user.userId;
             const user = await userService.getUserById(userId);
             
             if (user) {
@@ -75,12 +77,12 @@ export class AuthController {
             const { login, password, ...rest } = req.body;
 
             if (!password) {
-                return res.status(400).json({ error: 'Пароль обязателен' });
+                return res.status(400).json({ error: 'Пароль обязатеKsлен' });
             }
 
             this.validatePassword(password);
 
-            const existingUser = await userService.fetUserBeLogin(login);
+            const existingUser = await userService.getUserBeLogin(login);
             if (existingUser) {
                 return res.status(400).json({ error: 'Логин уже занят' });
             }
@@ -102,39 +104,81 @@ export class AuthController {
         }
     }
 
+//рефреш токен до 7 дней
+async refresh(req: Request, res: Response) {
+    try {
+      const { refreshToken } = req.cookies;
+      if (!refreshToken) {
+        return res.status(401).json({ error: 'Требуется авторизация' });
+      }
+  
+      // Валидация Refresh Token
+      const userData = TokenService.verifyRefreshToken(refreshToken);
+      if (!userData) {
+        return res.status(401).json({ error: 'Недействительный токен' });
+      }
+  
+      // Проверка существования пользователя
+      const user = await userService.getUserById(userData.userId);
+      if (!user) {
+        return res.status(404).json({ error: 'Пользователь не найден' });
+      }
+  
+      // Генерация новых токенов
+      const newAccessToken = TokenService.generateAccessToken(user.id, user.login);
+      const newRefreshToken = TokenService.generateRefreshToken(user.id, user.login);
+  
+      // Обновление куки
+      res.cookie('refreshToken', newRefreshToken, {
+        maxAge: 7 * 24 * 60 * 60 * 1000,
+        httpOnly: true,
+        secure: true,
+        sameSite: 'strict'
+      });
+  
+      res.json({ accessToken: newAccessToken });
+    } catch (error) {
+      console.error('Ошибка обновления токена:', error);
+      res.status(500).json({ error: 'Ошибка сервера' });
+    }
+  }
+
+  //Выход
+  async logout(req: Request, res: Response) {
+    try {
+      res.clearCookie('refreshToken');
+      res.json({ message: 'Выход выполнен успешно' });
+    } catch (error) {
+      console.error('Ошибка выхода:', error);
+      res.status(500).json({ error: 'Ошибка сервера' });
+    }
+  }
+
     // Аутентификация пользователя
     async login(req: Request, res: Response) {
         try {
           const { login, password } = req.body;
-          console.log('Вход:', { login, password });
-          console.log('Пароль в запросе:', JSON.stringify(password)); // Логируем пароль как строку
-          console.log('Длина пароля в запросе:', password.length);
-      
-          const user = await userService.fetUserBeLogin(login);
-          if (!user) {
-            console.log('Пользователь не найден');
+          
+          const user = await userService.getUserBeLogin(login);
+          if (!user || !(await TokenService.comparePassword(password, user.password))) {
             return res.status(401).json({ error: 'Неверные учетные данные' });
           }
       
-          console.log('Пользователь найден:', user);
-          console.log('Хешированный пароль в базе:', user.password);
-          console.log('Длина хеша в базе:', user.password.length);
+          // Генерация токенов
+          const accessToken = TokenService.generateAccessToken(user.id, user.login);
+          const refreshToken = TokenService.generateRefreshToken(user.id, user.login);
       
-          const isValid = await TokenService.comparePassword(password, user.password);
-          if (!isValid) {
-            console.log('Неверный пароль');
-            return res.status(401).json({ error: 'Неверные учетные данные' });
-          }
-      
-          const token = TokenService.generateToken(user.id, user.login);
-          console.log('Токен сгенерирован:', token);
+          // Установка Refresh Token в куки
+          res.cookie('refreshToken', refreshToken, {
+            maxAge: 7 * 24 * 60 * 60 * 1000, // 7 дней
+            httpOnly: true,
+            secure: true, // Для HTTPS
+            sameSite: 'strict'
+          });
       
           res.json({
-            token,
-            user: {
-              id: user.id,
-              login: user.login
-            }
+            accessToken,
+            user: { id: user.id, login: user.login }
           });
         } catch (error) {
           console.error('Ошибка входа:', error);
@@ -151,7 +195,7 @@ export class AuthController {
                 return res.status(401).json({ error: 'Пользователь не авторизован' });
             }
     
-            const userId = req.user.Id; // Теперь безопасный доступ
+            const userId = req.user.userId; // Теперь безопасный доступ
             const user = await userService.getUserById(userId);
             
             if (user) {

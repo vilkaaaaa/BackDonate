@@ -4,7 +4,10 @@
 const profileRepository = AppDataSource.getRepository(UserProfile);
 const userRepository = AppDataSource.getRepository(User);
 export class ProfileService{ 
-
+//получение всх профилей 
+async getAllProfile ():Promise<UserProfile[]>{
+  return profileRepository.find();
+}
   //получение данных о профиле - имя, цель, аватар, баланс, ТРАНЗАКЦИи. Получение через id пользователя(user)
   async getProfileByUserId(userId: number): Promise<UserProfile | null> {
     try {

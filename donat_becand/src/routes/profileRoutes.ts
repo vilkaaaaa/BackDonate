@@ -7,7 +7,17 @@ const profileController = new ProfileController();
 router.get('/profile/user/:userId', async (req, res) => {
     await profileController.getProfileByUser(req, res);
   });
+
+  // получение всех профилей
+  router.get('/profiles/all', async (req, res) => {
+    await profileController.getProfiles(req, res);
+  });
+
   router.get('/profile/userUp/:userId', async (req, res) => {
-    await profileController.getProfileByUser(req, res);
+    await profileController.Update(req, res);
+  });
+
+  router.get('/profile/del/:profileId', async (req, res) => {
+    await profileController.deleteProfile(req, res);
   });
 export default router;

@@ -1,22 +1,36 @@
 import jwt from 'jsonwebtoken';
 import bcrypt from 'bcrypt';
 
+
 export class TokenService {
-  private static readonly SECRET_KEY = 'your-secret-key-here';
-  private static readonly EXPIRES_IN = '1h';
+   static readonly ACCESS_SECRET = 'your-secret-key-here';
+   static readonly ACCESS_EXPIRES_IN = '1h';
+static readonly REFRESH_SECRET = 'your-secret-key-here';
+static readonly REFRESH_EXPIRES_IN = '7d';
 
   // Генерация токена
-  static generateToken(userId: number, login: string): string {
+  static generateAccessToken(userId: number, login: string): string {
+    return jwt.sign(
+        { userId, login }, // Важно: используем userId
+        this.ACCESS_SECRET,
+        { expiresIn: this.ACCESS_EXPIRES_IN }
+    );
+}
+  //генерация решреш токена
+  static generateRefreshToken(userId: number, login: string): string {
     return jwt.sign(
       { userId, login },
-      this.SECRET_KEY,
-      { expiresIn: this.EXPIRES_IN }
+      this.REFRESH_SECRET,
+      { expiresIn: this.REFRESH_EXPIRES_IN }
     );
   }
-
+  //Верификация решреш токена
+  static verifyRefreshToken(token: string): any {
+    return jwt.verify(token, this.REFRESH_SECRET);
+  }
   // Верификация токена
-  static verifyToken(token: string): any {
-    return jwt.verify(token, this.SECRET_KEY);
+  static verifyAccessToken(token: string): any {
+    return jwt.verify(token, this.ACCESS_SECRET);
   }
 
   // Хеширование пароля
