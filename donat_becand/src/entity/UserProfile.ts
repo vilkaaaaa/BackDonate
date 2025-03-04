@@ -1,4 +1,4 @@
-import { Entity, PrimaryGeneratedColumn, Column, JoinColumn, OneToMany } from "typeorm";
+import { Entity, PrimaryGeneratedColumn, Column, JoinColumn, OneToOne } from "typeorm";
 import {User} from './User'
 
 @Entity('profile')
@@ -15,7 +15,7 @@ avatar!: string;
 
 @Column()
 userid!:number;
-@OneToMany(()=>User,(user)=>user.profiles)
+@OneToOne(()=>User,(user)=>user.profiles)
 @JoinColumn({name:'userid'})
 user!: User;
 

@@ -12,5 +12,5 @@ export const AppDataSource = new DataSource({
   password: '1',
   database: 'postgres',
   entities: [User, UserProfile, UserBalance, UserTransaction],  // Подключите ваши сущности
-  synchronize: true, // Только для разработки!
+  synchronize: false, // Только для разработки!
 });

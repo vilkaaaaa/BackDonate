@@ -1,16 +1,13 @@
   import { UserProfile } from "../entity/UserProfile";
   import { AppDataSource } from "../../DataSourse";
-const profileRepository = AppDataSource.getRepository(UserProfile)
+  import { User } from "../entity/User";
+const profileRepository = AppDataSource.getRepository(UserProfile);
+const userRepository = AppDataSource.getRepository(UserProfile);
 export class ProfileService{ 
   //получение данных о профиле - имя, цель, аватар, баланс, ТРАНЗАКЦИИ
 async getProfileId(id:number):Promise<UserProfile| null>{
   return profileRepository.findOne({where:{id}})
-}
-     //создание профиля - имя, цель, аватар
-async createProfile(profileData:Partial<UserProfile>):Promise<UserProfile>{
-  const profile = profileRepository.create(profileData);
-  return profileRepository.save(profile);
-}
+}  
       //изменение данных - имя, цель, аватар
       async updateProfile (id: number, userData: Partial<UserProfile>):Promise<UserProfile | null>{
         await profileRepository.update(id, userData);

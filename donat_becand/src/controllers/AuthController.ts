@@ -1,9 +1,11 @@
 import { User } from "../entity/User";
 import { UserService } from "../services/UserService";
 import { TokenService } from "../services/TokenService";
+import { ProfileService } from "../services/ProfileService";
 import { Request, Response, NextFunction } from 'express'
 
 const userService = new UserService();
+const profileService = new ProfileService;
 
 export class AuthController {
     static authMiddleware(
@@ -67,7 +69,7 @@ export class AuthController {
         }
     }
 
-    // Регистрация пользователя
+    // Регистрация пользователя и создание профиля
     async createUser(req: Request, res: Response) {
         try {
             const { login, password, ...rest } = req.body;
