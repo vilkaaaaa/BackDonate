@@ -25,9 +25,9 @@ router.post('/user',
     }
 );
 
-router.post('/login', 
+router.post('/refresh', 
     (req, res, next) => {
-        authController.login(req, res)
+        authController.refresh(req, res)
             .catch(next);
     }
 );
