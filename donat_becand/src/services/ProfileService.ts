@@ -38,10 +38,23 @@ async getAllProfile ():Promise<UserProfile[]>{
   }
 
       //изменение данных - имя, цель, аватар
-      async updateProfile (userId: number, userData: Partial<UserProfile>):Promise<UserProfile | null>{
-        await profileRepository.update(userId, userData);
-        return this.getProfileByUserId(userId);
+      async updateProfile(userId: number, userData: Partial<UserProfile>): Promise<UserProfile | null> {
+        try {
+          console.log('Обновление профиля для userId:', userId);
+          console.log('Новые данные:', userData);
+      
+          // Обновляем профиль
+          await profileRepository.update({ userid: userId }, userData);
+      
+          // Возвращаем обновленный профиль
+          const updatedProfile = await profileRepository.findOne({ where: { userid: userId } });
+          return updatedProfile;
+        } catch (error) {
+          console.error('Ошибка при обновлении профиля:', error);
+          throw error;
+        }
       }
+      
       //удвлить пользователя
       async deletProfile(id:number): Promise<void>{
         await profileRepository.delete(id);

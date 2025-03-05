@@ -1,5 +1,6 @@
 import { Request, Response } from "express";
 import { ProfileService } from "../services/ProfileService";
+import { UserProfile } from "../entity/UserProfile";
 
 const profileService = new ProfileService;
 
@@ -37,24 +38,37 @@ async getProfileByUser(req: Request, res: Response) {
 //обновить данные
 async Update(req: Request, res: Response) {
   try {
-    const profileId = parseInt(req.params.id, 10);
-    if (isNaN(profileId)) {
+    const userId = parseInt(req.params.userId, 10);
+    if (isNaN(userId)) {
       return res.status(400).json({ error: 'Некорректный ID профиля' });
     }
 
     const userData = req.body;
-    const updatedProfile = await profileService.updateProfile(profileId, userData);
     
+    // Явно указываем допустимые поля и их тип
+    const allowedFields: (keyof UserProfile)[] = ['name', 'purpose', 'avatar'];
+    
+    // Фильтрация с type guard
+    const filteredData = Object.keys(userData)
+      .filter((key): key is keyof UserProfile => allowedFields.includes(key as keyof UserProfile))
+      .reduce((obj, key) => {
+        obj[key] = userData[key];
+        return obj;
+      }, {} as Partial<UserProfile>);
+
+    const updatedProfile = await profileService.updateProfile(userId, filteredData);
+
     if (!updatedProfile) {
       return res.status(404).json({ error: 'Профиль не найден' });
     }
-    
+
     res.json(updatedProfile);
   } catch (error) {
     console.error('Ошибка при обновлении профиля:', error);
     res.status(500).json({ error: 'Ошибка сервера' });
   }
 }
+
 //Удалить профиль
 async deleteProfile(req: Request, res: Response) {
   try {

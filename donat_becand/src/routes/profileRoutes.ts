@@ -13,7 +13,7 @@ router.get('/profile/user/:userId', async (req, res) => {
     await profileController.getProfiles(req, res);
   });
 
-  router.get('/profile/userUp/:userId', async (req, res) => {
+  router.patch('/profile/userUp/:userId', async (req, res) => {
     await profileController.Update(req, res);
   });
 
